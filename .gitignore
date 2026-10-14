@@ -1,0 +1,18 @@
+# Archivos del cliente (Excel reales de la radio): contienen datos de facturacion, nunca van a git
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Credenciales / configuracion sensible
+.env
+.env.*
+!.env.example
+secrets.toml
+.streamlit/secrets.toml
+
+# Respaldos locales de la base
+backups/
