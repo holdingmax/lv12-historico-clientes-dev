@@ -59,6 +59,11 @@ def norm(s: str) -> str:
     return re.sub(r"\s+", " ", s.lower()).strip()
 
 
+def colapsar(s: str) -> str:
+    """Nombre para guardar: espacios multiples a uno solo y sin espacios en los bordes."""
+    return re.sub(r"\s+", " ", s).strip()
+
+
 def clave_emisora(s: str) -> str:
     """Mayusculas/minusculas, espacios sobrantes y espacios alrededor de '/'."""
     return re.sub(r"\s*/\s*", "/", re.sub(r"\s+", " ", s.lower()).strip())
@@ -166,7 +171,7 @@ class Entidades:
         return self.cur.fetchone() is not None
 
     def resolver(self, crudo: str, lote_id: int) -> int:
-        nombre = crudo.strip()
+        nombre = colapsar(crudo)
         clave = norm(nombre)
         if clave in self.alias:
             return self.alias[clave]
@@ -219,7 +224,7 @@ class Emisoras:
         self.creadas = []
 
     def resolver(self, crudo: str):
-        nombre = crudo.strip()
+        nombre = colapsar(crudo)
         if not nombre:
             return None
         clave = clave_emisora(nombre)

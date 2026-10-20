@@ -22,6 +22,17 @@ def get_connection() -> psycopg.Connection:
     return psycopg.connect(url, autocommit=True)
 
 
+@st.cache_resource
+def get_connection_lectura() -> psycopg.Connection:
+    """Conexion para las pantallas de consulta: la base rechaza cualquier escritura."""
+    url = os.environ.get("DATABASE_URL")
+    if not url:
+        raise BaseNoConfigurada(
+            "Falta configurar la conexion a la base de datos (variable DATABASE_URL)."
+        )
+    return psycopg.connect(url, autocommit=True, options="-c default_transaction_read_only=on")
+
+
 def estado_base() -> tuple[bool, str]:
     """Devuelve (ok, mensaje) para mostrar en pantalla, sin errores tecnicos crudos."""
     try:
