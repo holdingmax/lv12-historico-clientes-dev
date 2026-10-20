@@ -9,7 +9,7 @@ def tabla_html(encabezados: list[str], filas: list[list[str]], derecha: set[int]
     """Las celdas son texto plano (se escapan aca). Devuelve una sola linea de HTML."""
     modo = tema.modo()
     borde, fondo_enc = tema.BORDE[modo], tema.ENCABEZADO[modo]
-    celda = f"padding:5px 10px;border-bottom:1px solid {borde};white-space:nowrap;"
+    celda = f"padding:5px 8px;border-bottom:1px solid {borde};white-space:nowrap;"
 
     def estilo(i: int) -> str:
         return celda + ("text-align:right;" if i in derecha else "text-align:left;")
@@ -26,6 +26,6 @@ def tabla_html(encabezados: list[str], filas: list[list[str]], derecha: set[int]
         ) + "</tr>")
     return (
         f"<div style='overflow-x:auto;border:1px solid {borde};border-radius:6px;'>"
-        f"<table style='width:100%;border-collapse:collapse;font-size:0.9rem;color:{tema.TEXTO[modo]};'>"
+        f"<table style='width:100%;border-collapse:collapse;font-size:0.85rem;color:{tema.TEXTO[modo]};'>"
         f"<thead><tr>{enc}</tr></thead><tbody>{''.join(cuerpo)}</tbody></table></div>"
     )

@@ -13,6 +13,7 @@ from src.matriz import armar_matriz
 
 CERO = Decimal(0)
 TIPOS_CLIENTE = {"Todos": None, "Privado": "privado", "Pública": "publica"}
+TEXTO_TIPO_CLIENTE = {"publica": "Pública", "privado": "Privada"}
 
 # Fondos suaves con texto oscuro fijo: se leen igual en tema claro y oscuro.
 COLOR_PERDIDO = ("#f8d7da", "#4a1414")
@@ -39,13 +40,14 @@ def tabla_html(matriz: dict, meses: list[int], duplicados: set[int]) -> str:
     # Total y Participación van justo después del nombre, para que se vean sin desplazarse.
     enc = (
         f"<th style='{celda}text-align:left;position:sticky;top:0;left:0;z-index:3;background:{fondo_enc};'>Cliente</th>"
-        + th("Total") + th("Participación")
+        + th("Tipo", "text-align:left;") + th("Total") + th("Participación")
         + "".join(th(MESES_CORTOS[m - 1]) for m in meses)
     )
     cuerpo = []
     for c in matriz["clientes"]:
         icono = "⚠ " if c["id"] in duplicados else ""
         celdas = [f"<td style='{nombre_col}' title='{html.escape(c['nombre'], quote=True)}'>{icono}{html.escape(c['nombre'])}</td>"]
+        celdas.append(f"<td style='{celda}'>{TEXTO_TIPO_CLIENTE.get(c['tipo'], c['tipo'])}</td>")
         celdas.append(f"<td style='{num}font-weight:600;'>{numero_ar(c['total'])}</td>")
         celdas.append(f"<td style='{num}'>{porcentaje(c['total'], total)}</td>")
         for m in meses:
@@ -68,7 +70,7 @@ def tabla_html(matriz: dict, meses: list[int], duplicados: set[int]) -> str:
 
     pie = (
         f"<tr style='font-weight:700;'><td style='{celda}position:sticky;bottom:0;left:0;z-index:3;background:{fondo_enc};'>Total</td>"
-        + pie_td(numero_ar(total)) + pie_td("100,0 %" if total else "-")
+        + pie_td("", "text-align:left;") + pie_td(numero_ar(total)) + pie_td("100,0 %" if total else "-")
         + "".join(pie_td(numero_ar(matriz["totales_mes"][m])) for m in meses)
         + "</tr>"
     )

@@ -10,7 +10,14 @@ CATEGORICAS = {
     "oscuro": ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300"],
 }
 
-SUPERFICIE = {"claro": "#ffffff", "oscuro": "#0e1117"}
+# Pauta publica vs privada: dos entidades fijas. Violeta (publica) y aqua (privada) validados
+# como par en claro y oscuro; no se reutilizan los azul/naranja de las dos primeras categorias.
+PUBLICA_PRIVADA = {
+    "claro": {"publica": "#6250d6", "privado": "#1baf7a"},
+    "oscuro": {"publica": "#9085e9", "privado": "#199e70"},
+}
+
+SUPERFICIE ={"claro": "#ffffff", "oscuro": "#0e1117"}
 ENCABEZADO = {"claro": "#f0f2f6", "oscuro": "#262730"}
 BORDE = {"claro": "rgba(49,51,63,0.2)", "oscuro": "rgba(250,250,250,0.2)"}
 TEXTO = {"claro": "#31333f", "oscuro": "#fafafa"}

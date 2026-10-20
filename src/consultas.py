@@ -156,6 +156,21 @@ def neto_por_mes_y_tipo(lote: int, anio: int, emisora_id: int | None) -> list[di
     )
 
 
+def neto_por_mes_y_clase(lote: int, anio: int, emisora_id: int | None) -> list[dict]:
+    """Neto (y total con IVA) por mes y tipo de cliente ('publica' / 'privado')."""
+    return _consultar(
+        f"""
+        SELECT l.mes, cl.tipo, sum(l.neto) AS neto, sum(l.total_con_iva) AS total_con_iva
+        FROM orden_linea l
+        JOIN cliente cl ON cl.id = l.cliente_id
+        WHERE l.lote_id = %s AND l.anio = %s AND {FILTRO_EMISORA}
+        GROUP BY l.mes, cl.tipo
+        ORDER BY l.mes, cl.tipo
+        """,
+        (lote, anio, emisora_id, emisora_id),
+    )
+
+
 def clientes_activos_por_mes(lote: int, anio: int, emisora_id: int | None) -> dict[int, int]:
     """Clientes con neto mayor a cero en el mes (mismo criterio que la matriz de clientes)."""
     filas = _consultar(
