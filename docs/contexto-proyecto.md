@@ -27,7 +27,7 @@ Testing: repo y servicio `lv12-historico-clientes-dev`, base `lv12-historico-cli
   - "Canjes Facturados" (OP Agencia) y "Canjes sin Facturar" (Vendedor).
   - La fila "Totales" tiene el texto en la columna E y el importe en la F. La fila 1 de cada hoja dice "Mes: X  Año: 2026" y el importador la valida contra el nombre de la hoja.
   - Octubre a diciembre tienen la plantilla armada (encabezados y Totales en 0) pero ninguna fila de datos.
-- Pestaña "Resumen": titulo dice "RESUMEN DE VENTAS 2025" pero los numeros coinciden con los Totales de las hojas 2026: es 2026 (confirmado contra el archivo; sigue conviniendo avisarle a Maxi del titulo). Se usa solo como control de totales.
+- Pestaña "Resumen": titulo dice "RESUMEN DE VENTAS 2025" pero los numeros coinciden con los Totales de las hojas 2026 (se comparo mes por mes y tipo por tipo), asi que es 2026; sigue conviniendo avisarle a Maxi del titulo. Unica excepcion: en julio la pestaña dice Local sin facturar 942.187,50 (la hoja Julio, 906.750,00) y Canjes facturados 259.512,50 (la hoja, 238.250,00): 56.700 de diferencia entre ambas. La conciliacion usa los Totales de las hojas mensuales. Se usa solo como control de totales.
 - Perfil leido: 735 lineas, de las cuales 59 son de Coproducciones. Agencias 212 (neto 33,92 M), Local Facturado 383 (85,91 M), Local Sin Facturar 54 (5,32 M), Coproducciones 59 (7,37 M), Canjes Facturados 11, Canjes sin Facturar 16. El perfil anterior (676 lineas) no contaba Coproducciones.
 - Neto mensual sin Coproducciones (millones): ene 11,90; feb 11,42; mar 11,41; abr 12,62; may 13,76; jun 16,52; jul 17,19; ago 16,05; sep 16,73. La pestaña Resumen incluye Coproducciones (ene 12,10).
 - Diferencia de abril: Local Facturado suma 7.041.651,76 en las filas y el "Totales" del Excel dice 6.815.901,76 (tambien la pestaña Resumen). Son 225.750, exactamente la fila 44 (Banco Macro), la primera del bloque: parece quedar fuera de la formula del Excel. Se carga igual y la tabla de control muestra la diferencia. Consultar a Maxi.
@@ -46,7 +46,7 @@ Testing: repo y servicio `lv12-historico-clientes-dev`, base `lv12-historico-cli
 
 ## Pendientes de confirmar con Maxi
 1. Como se reconoce la pauta publica (hay municipios dentro de Local Facturado).
-2. Avisarle del titulo "2025" de la pestaña Resumen (los numeros son 2026) y preguntar por la fila de Banco Macro de abril que el Totales no suma (225.750) y por los codigos de OP en la columna Vendedor.
+2. Avisarle del titulo "2025" de la pestaña Resumen (los numeros son 2026) y preguntar por la fila de Banco Macro de abril que el Totales no suma (225.750), por los codigos de OP en la columna Vendedor y por julio, donde la pestaña Resumen difiere de la hoja Julio en 56.700 (Local sin facturar y Canjes facturados).
 3. (Resuelto) Formato de la hoja de Coproducciones: cliente en la columna A.
 4. Quienes seran los usuarios: Maxi y un par de personas mas que operan. Los usuarios se crean desde Toolbox.
 5. Como se integra con Ratio.

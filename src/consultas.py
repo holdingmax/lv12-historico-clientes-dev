@@ -106,6 +106,145 @@ def lineas_con_codigo_de_op(lote: int) -> list[dict]:
     )
 
 
+# ---------------------------------------------------------------- tablero y clientes por mes
+# Filtro de emisora: None = todas. El mismo valor se pasa dos veces (IS NULL / igualdad).
+FILTRO_EMISORA = "(%s::int IS NULL OR l.emisora_id = %s)"
+
+
+def tipos_de_venta() -> list[dict]:
+    return _consultar("SELECT codigo, nombre, orden FROM tipo_venta ORDER BY orden")
+
+
+def anios_con_datos(lote: int) -> list[int]:
+    filas = _consultar(
+        "SELECT DISTINCT anio FROM orden_linea WHERE lote_id = %s ORDER BY anio DESC", (lote,)
+    )
+    return [f["anio"] for f in filas]
+
+
+def emisoras_con_datos(lote: int, anio: int) -> list[dict]:
+    return _consultar(
+        """
+        SELECT DISTINCT e.id, e.nombre
+        FROM orden_linea l JOIN emisora e ON e.id = l.emisora_id
+        WHERE l.lote_id = %s AND l.anio = %s
+        ORDER BY e.nombre
+        """,
+        (lote, anio),
+    )
+
+
+def meses_con_datos(lote: int, anio: int) -> list[int]:
+    filas = _consultar(
+        "SELECT DISTINCT mes FROM orden_linea WHERE lote_id = %s AND anio = %s ORDER BY mes",
+        (lote, anio),
+    )
+    return [f["mes"] for f in filas]
+
+
+def neto_por_mes_y_tipo(lote: int, anio: int, emisora_id: int | None) -> list[dict]:
+    """Neto (y total con IVA) por mes y tipo de venta. Solo aparecen los meses con lineas."""
+    return _consultar(
+        f"""
+        SELECT l.mes, l.tipo_venta, sum(l.neto) AS neto, sum(l.total_con_iva) AS total_con_iva
+        FROM orden_linea l
+        WHERE l.lote_id = %s AND l.anio = %s AND {FILTRO_EMISORA}
+        GROUP BY l.mes, l.tipo_venta
+        ORDER BY l.mes, l.tipo_venta
+        """,
+        (lote, anio, emisora_id, emisora_id),
+    )
+
+
+def clientes_activos_por_mes(lote: int, anio: int, emisora_id: int | None) -> dict[int, int]:
+    """Clientes con neto mayor a cero en el mes (mismo criterio que la matriz de clientes)."""
+    filas = _consultar(
+        f"""
+        SELECT mes, count(*) AS clientes FROM (
+            SELECT l.mes, l.cliente_id
+            FROM orden_linea l
+            WHERE l.lote_id = %s AND l.anio = %s AND {FILTRO_EMISORA}
+            GROUP BY l.mes, l.cliente_id
+            HAVING sum(l.neto) > 0
+        ) t
+        GROUP BY mes
+        """,
+        (lote, anio, emisora_id, emisora_id),
+    )
+    return {f["mes"]: f["clientes"] for f in filas}
+
+
+def _patron_busqueda(texto_normalizado: str) -> str | None:
+    """Patron LIKE 'contiene' con los comodines del usuario escapados."""
+    if not texto_normalizado:
+        return None
+    escapado = (
+        texto_normalizado.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    )
+    return f"%{escapado}%"
+
+
+def neto_por_cliente_y_mes(
+    lote: int, anio: int, emisora_id: int | None, tipos: list[str],
+    tipo_cliente: str | None, busqueda_normalizada: str,
+) -> list[dict]:
+    """Una fila por cliente y mes con el neto, ya sumado en la base."""
+    patron = _patron_busqueda(busqueda_normalizada)
+    return _consultar(
+        rf"""
+        SELECT cl.id AS cliente_id, cl.nombre, cl.tipo, l.mes, sum(l.neto) AS neto
+        FROM orden_linea l
+        JOIN cliente cl ON cl.id = l.cliente_id
+        WHERE l.lote_id = %s AND l.anio = %s AND {FILTRO_EMISORA}
+          AND l.tipo_venta = ANY(%s)
+          AND (%s::text IS NULL OR cl.tipo = %s)
+          AND (%s::text IS NULL OR EXISTS (
+                SELECT 1 FROM cliente_alias a
+                WHERE a.cliente_id = cl.id AND a.alias_normalizado LIKE %s ESCAPE '\'))
+        GROUP BY cl.id, cl.nombre, cl.tipo, l.mes
+        ORDER BY cl.id, l.mes
+        """,
+        (lote, anio, emisora_id, emisora_id, tipos, tipo_cliente, tipo_cliente, patron, patron),
+    )
+
+
+def lineas_de_cliente(
+    lote: int, cliente_id: int, anio: int, emisora_id: int | None, tipos: list[str]
+) -> list[dict]:
+    return _consultar(
+        f"""
+        SELECT l.mes, t.nombre AS tipo, ag.nombre AS agencia, e.nombre AS emisora,
+               l.op, l.neto
+        FROM orden_linea l
+        JOIN tipo_venta t ON t.codigo = l.tipo_venta
+        LEFT JOIN agencia ag ON ag.id = l.agencia_id
+        LEFT JOIN emisora e ON e.id = l.emisora_id
+        WHERE l.lote_id = %s AND l.cliente_id = %s AND l.anio = %s AND {FILTRO_EMISORA}
+          AND l.tipo_venta = ANY(%s)
+        ORDER BY l.mes, t.orden, l.fila_origen
+        """,
+        (lote, cliente_id, anio, emisora_id, emisora_id, tipos),
+    )
+
+
+def clientes_con_sugerencia_abierta() -> set[int]:
+    filas = _consultar(
+        """
+        SELECT nombre_id AS id FROM sugerencia_fusion WHERE entidad = 'cliente' AND estado = 'abierta'
+        UNION
+        SELECT parecido_id FROM sugerencia_fusion WHERE entidad = 'cliente' AND estado = 'abierta'
+        """
+    )
+    return {f["id"] for f in filas}
+
+
+def cantidad_de_duplicados_posibles() -> int:
+    filas = _consultar(
+        "SELECT count(*) AS n FROM sugerencia_fusion WHERE entidad = 'cliente' AND estado = 'abierta'"
+    )
+    return filas[0]["n"]
+
+
 def sugerencias_abiertas() -> list[dict]:
     return _consultar(
         """

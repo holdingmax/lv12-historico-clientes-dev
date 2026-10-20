@@ -1,5 +1,6 @@
 """Formato de numeros, fechas y tablas para las pantallas (convenciones argentinas)."""
 import re
+import unicodedata
 from datetime import datetime
 from decimal import Decimal
 from zoneinfo import ZoneInfo
@@ -32,6 +33,16 @@ def fecha_hora_ar(fecha: datetime) -> str:
 
 def mes_anio(anio: int, mes: int) -> str:
     return f"{MESES[mes - 1]} {anio}"
+
+
+MESES_CORTOS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+
+
+def normalizar_nombre(s: str) -> str:
+    """Minusculas, sin tildes, espacios simples (igual que los alias de la base)."""
+    s = unicodedata.normalize("NFD", str(s))
+    s = "".join(c for c in s if unicodedata.category(c) != "Mn")
+    return re.sub(r"\s+", " ", s.lower()).strip()
 
 
 def md(texto) -> str:
