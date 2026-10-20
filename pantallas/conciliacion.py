@@ -4,6 +4,7 @@ from decimal import Decimal
 import streamlit as st
 
 from src import consultas
+from src.auth import require_login
 from src.db import BaseNoConfigurada
 from src.formato import (
     fecha_hora_ar, md, mes_anio, numero_ar, porcentaje_ar, tabla_md,
@@ -137,6 +138,7 @@ def para_consultar_con_maxi(carga: dict) -> None:
 
 
 def main() -> None:
+    require_login()  # primera linea: sin sesion no se consulta nada
     st.title("Conciliación contra el Excel")
     st.caption(
         "Compara lo que quedó cargado en la base con los totales que trae el Excel. "

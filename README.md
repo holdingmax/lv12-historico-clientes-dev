@@ -28,6 +28,19 @@ responsable (Federico Vigo).
 
 Los Excel reales de la radio van en `data/` (no se versiona en git).
 
+## Acceso (login propio)
+
+Cada herramienta tiene su propio login: Toolbox es solo la puerta de entrada. Los usuarios
+se guardan en la base (tabla `usuario`, contrasenas con hash bcrypt, nunca en claro).
+
+- Crear un usuario: `python scripts/crear_usuario.py`. Pide email, nombre, rol y una
+  contrasena temporal (se escribe sin mostrarse). En su primer ingreso la persona tiene que
+  elegir una propia (minimo 10 caracteres).
+- 5 intentos fallidos seguidos bloquean la cuenta 15 minutos; la sesion vence a los 60
+  minutos sin actividad. Todos los intentos quedan en `acceso_log`.
+- Pruebas: `python -m unittest discover -s tests -t .` (usan la base de testing y crean y
+  borran usuarios descartables).
+
 ## Render (Start Command)
 
 `streamlit run app.py --server.port $PORT --server.address 0.0.0.0`
@@ -60,4 +73,4 @@ negocio comentadas en el codigo con su motivo.
 - Acceso a los datos de Ratio (base, API o solo exportacion).
 - Como distinguir pauta publica (municipio, legislatura) en los archivos de origen.
 - Si la pestana "Resumen" del Excel de publicidades (titulo 2025) es en realidad de 2026.
-- Quienes usan el sistema y con que permisos (ver, operar, administrar). Acceso via Toolbox.
+- Que puede hacer cada rol (administrador / operador) cuando haya pantallas que escriban datos.

@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from src import consultas, tema
+from src.auth import require_login
 from src.db import BaseNoConfigurada
 from src.formato import MESES, MESES_CORTOS, numero_ar
 from src.tablas import tabla_html
@@ -106,6 +107,7 @@ def tabla_mes_tipo(meses, neto, iva, tipos, con_iva: bool) -> None:
 
 
 def main() -> None:
+    require_login()  # primera linea: sin sesion no se consulta nada
     st.title("Tablero mensual")
     st.caption(
         "Neto facturado por mes y tipo de venta, según lo que quedó cargado en la base. "

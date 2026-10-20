@@ -48,7 +48,7 @@ Testing: repo y servicio `lv12-historico-clientes-dev`, base `lv12-historico-cli
 1. Como se reconoce la pauta publica (hay municipios dentro de Local Facturado).
 2. Avisarle del titulo "2025" de la pestaña Resumen (los numeros son 2026) y preguntar por la fila de Banco Macro de abril que el Totales no suma (225.750), por los codigos de OP en la columna Vendedor y por julio, donde la pestaña Resumen difiere de la hoja Julio en 56.700 (Local sin facturar y Canjes facturados).
 3. (Resuelto) Formato de la hoja de Coproducciones: cliente en la columna A.
-4. Quienes seran los usuarios: Maxi y un par de personas mas que operan. Los usuarios se crean desde Toolbox.
+4. Quienes seran los usuarios: Maxi y un par de personas mas que operan. Decision de direccion: Toolbox es solo la puerta de entrada; esta herramienta tiene su propio login, usuarios y roles (migracion 004, `src/auth.py`). Roles: administrador y operador (hoy ven las mismas pantallas). Los usuarios se crean con `scripts/crear_usuario.py`. Falta definir que puede hacer cada rol cuando haya pantallas de escritura.
 5. Como se integra con Ratio.
 
 ## Pantallas previstas

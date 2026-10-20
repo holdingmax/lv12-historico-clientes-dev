@@ -5,6 +5,7 @@ from decimal import Decimal
 import streamlit as st
 
 from src import consultas, tema
+from src.auth import require_login
 from src.db import BaseNoConfigurada
 from src.exportar import matriz_a_excel
 from src.formato import MESES, MESES_CORTOS, md, normalizar_nombre, numero_ar, tabla_md
@@ -110,6 +111,7 @@ def detalle_de_cliente(lote, anio, emisora_id, tipos_elegidos, matriz) -> None:
 
 
 def main() -> None:
+    require_login()  # primera linea: sin sesion no se consulta nada
     st.title("Clientes por mes")
     st.caption(
         "Neto de cada cliente mes a mes, según lo que quedó cargado en la base. "

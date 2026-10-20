@@ -1,14 +1,14 @@
 # Config para correr detras del reverse proxy de Render. server.port/server.address
 # se pasan por CLI en el Start Command (dependen de $PORT, que Render define en runtime).
 #
-# enableXsrfProtection = false: mismo ajuste que el proyecto hwc-rotacion-turnos. Detras del
-# proxy de Render la proteccion XSRF de Streamlit suele rechazar la subida de archivos (403).
-# Revisar cuando se agregue el login: si se puede reactivar, conviene reactivarlo.
+# La proteccion XSRF de Streamlit queda ACTIVA (por defecto) ahora que la herramienta tiene
+# login. Antes estaba desactivada porque, detras del proxy de Render, solia rechazar la subida
+# de archivos (403). Hoy no hay subida de archivos; si la pantalla de importacion la agrega y
+# falla con 403 en Render, revisar ese caso puntual en vez de apagar la proteccion.
+# (Con XSRF activa, Streamlit fuerza enableCORS = true, por eso ya no se configura.)
 
 [server]
 headless = true
-enableCORS = false
-enableXsrfProtection = false
 
 [browser]
 gatherUsageStats = false
