@@ -41,6 +41,7 @@ Testing: repo y servicio `lv12-historico-clientes-dev`, base `lv12-historico-cli
 - Ignora filas de Totales y bloques vacios.
 - Rechaza filas sin neto o sin cliente, guardando hoja, fila y motivo en `fila_rechazada`.
 - Los nombres de cliente y agencia se normalizan (minusculas, sin tildes, espacios simples) y se buscan en las tablas de alias. Si no existen, se crean con el nombre tal como viene y se registra su alias; las lineas se cargan siempre. Si el nombre nuevo se parece (similitud >= 0,9, difflib) a uno existente, se registra en `sugerencia_fusion` (migracion 002, reemplaza a `nombre_pendiente`) para fusionarlo desde pantalla; la sugerencia no afecta las lineas ni los totales.
+- Las sugerencias las resuelve un administrador en la pantalla "Nombres duplicados" (solo administradores): puede unir dos clientes o dos agencias (elige cual nombre sobrevive) o marcar "No es el mismo". Unir es irreversible y va en una sola transaccion: las lineas pasan al que sobrevive, el nombre absorbido queda como alias (los proximos archivos lo cargan directo en el sobreviviente), se cierran o repuntan las sugerencias relacionadas, se borra la fila absorbida y todo queda en `fusion_log` (migracion 006). Si los dos clientes tienen tipo distinto se pide confirmacion y se conserva 'publica' si alguno lo era. El neto total no cambia.
 - Al terminar compara el neto por mes y tipo contra el Excel y muestra la diferencia.
 - Periodo, emisora y OP vienen con formatos variables y pueden faltar: guardar el texto original y no inventar valores.
 

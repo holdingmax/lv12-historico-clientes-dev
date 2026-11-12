@@ -244,6 +244,15 @@ def sesion_actual() -> dict | None:
     return usuario
 
 
+def require_admin() -> dict:
+    """Como require_login, y ademas corta si la persona no es administradora."""
+    usuario = require_login()
+    if usuario["rol"] != "administrador":
+        st.error("Esta pantalla es solo para administradores.")
+        st.stop()
+    return usuario
+
+
 def require_login() -> dict:
     """Primera linea de cada pantalla: sin sesion valida muestra el login y corta la ejecucion
     (antes de cualquier consulta). Si falta cambiar la contrasena, muestra solo esa pantalla."""

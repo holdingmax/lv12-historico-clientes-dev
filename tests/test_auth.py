@@ -36,7 +36,7 @@ def email_de_prueba() -> str:
 
 def consulta(sql, params=()):
     with auth._conexion_escritura() as conn:
-        cur = conn.execute(sql, params)
+        cur = conn.execute(sql, params or None)  # sin parametros no se interpretan los '%' del SQL
         return cur.fetchall() if cur.description else None
 
 

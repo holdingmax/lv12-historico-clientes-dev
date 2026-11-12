@@ -38,6 +38,9 @@ se guardan en la base (tabla `usuario`, contrasenas con hash bcrypt, nunca en cl
   elegir una propia (minimo 10 caracteres).
 - 5 intentos fallidos seguidos bloquean la cuenta 15 minutos; la sesion vence a los 60
   minutos sin actividad. Todos los intentos quedan en `acceso_log`.
+- Roles: ambos ven el Tablero, Clientes por mes y la Conciliacion. "Nombres duplicados"
+  (unir clientes o agencias que son la misma entidad) es solo para administradores y es la unica
+  pantalla que escribe en la base.
 - Pruebas: `python -m unittest discover -s tests -t .` (usan la base de testing y crean y
   borran usuarios descartables).
 

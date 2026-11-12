@@ -260,6 +260,48 @@ def cantidad_de_duplicados_posibles() -> int:
     return filas[0]["n"]
 
 
+# ---------------------------------------------------------------- nombres duplicados (lectura)
+_RESUMEN_CLIENTES = """
+    SELECT c.id, c.nombre, c.tipo, coalesce(sum(l.neto), 0) AS neto, count(l.id) AS lineas,
+           array_remove(array_agg(DISTINCT l.anio * 100 + l.mes), NULL) AS periodos
+    FROM cliente c
+    LEFT JOIN orden_linea l ON l.cliente_id = c.id AND l.lote_id = %s
+    GROUP BY c.id, c.nombre, c.tipo
+    ORDER BY lower(c.nombre)
+"""
+_RESUMEN_AGENCIAS = """
+    SELECT c.id, c.nombre, NULL::text AS tipo, coalesce(sum(l.neto), 0) AS neto, count(l.id) AS lineas,
+           array_remove(array_agg(DISTINCT l.anio * 100 + l.mes), NULL) AS periodos
+    FROM agencia c
+    LEFT JOIN orden_linea l ON l.agencia_id = c.id AND l.lote_id = %s
+    GROUP BY c.id, c.nombre
+    ORDER BY lower(c.nombre)
+"""
+
+
+def resumen_de_entidades(entidad: str, lote: int) -> list[dict]:
+    """Cada cliente (o agencia) con su neto total, cantidad de lineas y periodos (aaaamm) en que aparece."""
+    sql = {"cliente": _RESUMEN_CLIENTES, "agencia": _RESUMEN_AGENCIAS}[entidad]
+    return _consultar(sql, (lote,))
+
+
+def sugerencias_con_ids(entidad: str) -> list[dict]:
+    """Sugerencias abiertas de la entidad, de mayor a menor parecido."""
+    return _consultar(
+        "SELECT id, nombre_id, parecido_id, similitud FROM sugerencia_fusion "
+        "WHERE entidad = %s AND estado = 'abierta' ORDER BY similitud DESC, id",
+        (entidad,),
+    )
+
+
+def uniones_hechas(limite: int = 100) -> list[dict]:
+    return _consultar(
+        "SELECT fecha, entidad, absorbido_nombre, sobreviviente_nombre, lineas_movidas, usuario_email "
+        "FROM fusion_log ORDER BY fecha DESC, id DESC LIMIT %s",
+        (limite,),
+    )
+
+
 def sugerencias_abiertas() -> list[dict]:
     return _consultar(
         """
